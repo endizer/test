@@ -67,6 +67,7 @@
 		
 	}
 	bool=false; //Стоит ли . в числе или нет
+	bool2 = false; //Если прошлая операция = true
 	function bott(event) {
 		switch (event) {
 			case '-1': //Удалить один символ
@@ -82,6 +83,9 @@
 			case 'clear':
 				out.innerHTML=0;
 				bool=false;
+				arr=[];
+				massS=[];
+				error='';
 				break;
 
 			case '.':
@@ -106,11 +110,16 @@
 					out.innerHTML+=event;
 				}
 
+				else if (out.innerHTML=='На 0 делить нельзя!') {
+					out.innerHTML='0'+event;
+					error='';
+				}
+
 				else {
 					out.innerHTML+=event;
 				}
 				bool=false;
-
+				bool2=false;
 				break;
 
 			case '0':
@@ -123,15 +132,18 @@
 			case '7':
 			case '8':
 			case '9':
-				if (out.innerHTML=="0") {
+				if ((out.innerHTML=="0") || (bool2==true)) {
 					out.innerHTML=event;
 				}
 
 				else {
 					out.innerHTML+=event;
 				}
+
 				break;
 			case '=':
+
+			lastsum=out.innerHTML.substr(-1);
 			if (!((lastsum=='+') || (lastsum=='-') || (lastsum=='*') || (lastsum=='/'))) {
 			
 
@@ -159,7 +171,11 @@
 					massS.splice(i,1);
 				}
 				out.innerHTML=arr[0];
-				if (error) {out.innerHTML=error;}
+				if (error) {
+					out.innerHTML=error;
+				};
+
+				bool2=true;
 			}
 				break;
 
