@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Калькулятор</title>
+	<style type="text/css">
+	#center {
+		width: 120px;
+		margin: auto;
+		padding-top: 50px;
+	}
+
+	.bott {
+		width: 25px;
+		padding: 5px;
+		margin-bottom: 5px;
+	}
+
+	.zero {
+		width: 54px;
+	}
+
+	#out {
+		width: 105px;
+		line-height: 25px;
+		border: 1px solid #000;
+		margin-bottom: 5px;
+		padding-left: 5px;
+	}
+	</style>
+
+	<script type="text/javascript">
+	var massS=[];
+	function replacement(sumb) {
+		
+		while(str.indexOf(sumb)!=-1) {
+			ev=str.indexOf(sumb);
+			str=str.substr(0,str.indexOf(sumb))+'?'+str.substr((str.indexOf(sumb)+1));
+			massS.push(sumb);
+		}
+	}
+
+	function action(int1, int2, evn) {
+		int1=Number(int1);
+		int2=Number(int2);
+
+		switch(evn) {
+			case '+':
+				return int1+int2;
+				break;
+			case '-':
+				return int1-int2;
+				break;
+			case '*':
+				return int1*int2;
+				break;
+			case '/':
+				return int1/int2;
+				break;
+
+		}
+	}
+
+
+	function run() {
+		out=document.getElementById("out");
+		
+	}
+	bool=false; //Стоит ли . в числе или нет
+	function bott(event) {
+		switch (event) {
+			case '-1': //Удалить один символ
+				if (out.innerHTML.length==1) {
+					out.innerHTML='0';
+				}
+				else {
+					out.innerHTML=out.innerHTML.substring(0, out.innerHTML.length-1);
+				}
+
+				break;
+
+			case 'clear':
+				out.innerHTML=0;
+				bool=false;
+				break;
+
+			case '.':
+				lastsum=out.innerHTML.substr(-1);//Последний символ
+				if (bool==false) {
+					out.innerHTML+='.';
+					bool=true;
+				}
+				else if ((lastsum=='+') || (lastsum=='-') || (lastsum=='*') || (lastsum=='/')) {
+					out.innerHTML+='0.';
+					bool=true;
+				}
+				break;
+
+			case '+':
+			case '-':
+			case '*':
+			case '/':
+				lastsum=out.innerHTML.substr(-1);
+				if ((lastsum=='+') || (lastsum=='-') || (lastsum=='*') || (lastsum=='/')) {
+					out.innerHTML=out.innerHTML.substring(0, out.innerHTML.length-1);
+					out.innerHTML+=event;
+				}
+
+				else {
+					out.innerHTML+=event;
+				}
+				bool=false;
+
+				break;
+
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				if (out.innerHTML=="0") {
+					out.innerHTML=event;
+				}
+
+				else {
+					out.innerHTML+=event;
+				}
+				break;
+			case '=':
+			if (!((lastsum=='+') || (lastsum=='-') || (lastsum=='*') || (lastsum=='/'))) {
+			
+
+
+				str=out.innerHTML;
+				replacement('+');
+				replacement('-');
+				replacement('*');
+				replacement('/');
+
+				arr=str.split('?');
+				for (var i = 0; i < massS.length; i++) {
+					if((massS[i]=='*') || (massS[i]=='/')) {
+						arr[i]=action(arr[i],arr[i+1],massS[i]);
+						arr.splice(i+1,1);
+						massS.splice(i,1);
+						if(arr[i]==Infinity) error="На 0 делить нельзя!";
+
+					}
+				}
+
+				for (var i = 0; i < massS.length; i++) {
+					arr[i]=action(arr[i],arr[i+1],massS[i]);
+					arr.splice(i+1,1);
+					massS.splice(i,1);
+				}
+				out.innerHTML=arr[0];
+				if (error) {out.innerHTML=error;}
+			}
+				break;
+
+		}
+	}
+
+	</script>
+	
+</head>
+<body onload="run()">
+<div id="center">
+<div id="out">0</div>
+<button onclick="bott('-1')" class="bott zero">←</button>
+<button onclick="bott('clear')" class="bott zero">CE</button><br>
+<button onclick="bott('7')" class="bott">7</button>
+<button onclick="bott('8')" class="bott">8</button>
+<button onclick="bott('9')" class="bott">9</button>
+<button onclick="bott('/')" class="bott">/</button><br>
+<button onclick="bott('4')" class="bott">4</button>
+<button onclick="bott('5')" class="bott">5</button>
+<button onclick="bott('6')" class="bott">6</button>
+<button onclick="bott('*')" class="bott">*</button><br>
+<button onclick="bott('1')" class="bott">1</button>
+<button onclick="bott('2')" class="bott">2</button>
+<button onclick="bott('3')" class="bott">3</button>
+<button onclick="bott('-')" class="bott">-</button><br>
+<button onclick="bott('0')" class="bott zero">0</button>
+<button onclick="bott('.')" class="bott">.</button>
+<button onclick="bott('+')" class="bott">+</button><br>
+<button onclick="bott('=')" class="bott zero" style="margin-left: 58px">=</button>
+</div>
+</body>
+</html>
