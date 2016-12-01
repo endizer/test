@@ -21,24 +21,19 @@
 	}
 
 	#out {
-		width: 105px;
+		width: 145px;
 		line-height: 25px;
 		border: 1px solid #000;
 		margin-bottom: 5px;
 		padding-left: 5px;
+		text-overflow: clip;
+		white-space: nowrap;
+		overflow: hidden;
 	}
 	</style>
 
 	<script type="text/javascript">
-	var massS=[];
-	function replacement(sumb) {
-		
-		while(str.indexOf(sumb)!=-1) {
-			ev=str.indexOf(sumb);
-			str=str.substr(0,str.indexOf(sumb))+'?'+str.substr((str.indexOf(sumb)+1));
-			massS.push(sumb);
-		}
-	}
+	var massS = [];
 
 	function action(int1, int2, evn) {
 		int1=Number(int1);
@@ -46,16 +41,14 @@
 
 		switch(evn) {
 			case '+':
-				return int1+int2;
-				break;
 			case '-':
-				return int1-int2;
+				return int1 + int2;
 				break;
 			case '*':
-				return int1*int2;
+				return int1 * int2;
 				break;
 			case '/':
-				return int1/int2;
+				return int1 / int2;
 				break;
 
 		}
@@ -71,55 +64,62 @@
 	function bott(event) {
 		switch (event) {
 			case '-1': //Удалить один символ
-				if (out.innerHTML.length==1) {
-					out.innerHTML='0';
+				if (out.innerHTML.length == 1) {
+					out.innerHTML = '0';
 				}
 				else {
-					out.innerHTML=out.innerHTML.substring(0, out.innerHTML.length-1);
+					out.innerHTML = out.innerHTML.substring(0, out.innerHTML.length-1);
 				}
-
 				break;
 
 			case 'clear':
-				out.innerHTML=0;
-				bool=false;
-				arr=[];
-				massS=[];
-				error='';
+				out.innerHTML = 0;
+				bool = false;
+				arr = [];
+				massS = [];
+				error = '';
 				break;
 
 			case '.':
 				lastsum=out.innerHTML.substr(-1);//Последний символ
+				if (out.innerHTML == 'На 0 делить нельзя!') {
+					out.innerHTML = '0'+event;
+					error = '';
+					bool=true;
+				}
+
 				if (bool==false) {
-					out.innerHTML+='.';
+					out.innerHTML += '.';
 					bool=true;
 				}
-				else if ((lastsum=='+') || (lastsum=='-') || (lastsum=='*') || (lastsum=='/')) {
-					out.innerHTML+='0.';
+				else if ((lastsum == '+') || (lastsum == '-') || (lastsum == '*') || (lastsum == '/')) {
+					out.innerHTML += '0.';
 					bool=true;
 				}
+
+
 				break;
 
 			case '+':
 			case '-':
 			case '*':
 			case '/':
-				lastsum=out.innerHTML.substr(-1);
-				if ((lastsum=='+') || (lastsum=='-') || (lastsum=='*') || (lastsum=='/')) {
-					out.innerHTML=out.innerHTML.substring(0, out.innerHTML.length-1);
-					out.innerHTML+=event;
+				lastsum = out.innerHTML.substr(-1);
+				if ((lastsum == '+') || (lastsum == '-') || (lastsum == '*') || (lastsum == '/')) {
+					out.innerHTML = out.innerHTML.substring(0, out.innerHTML.length-1);
+					out.innerHTML += event;
 				}
 
-				else if (out.innerHTML=='На 0 делить нельзя!') {
-					out.innerHTML='0'+event;
-					error='';
+				else if (out.innerHTML == 'На 0 делить нельзя!') {
+					out.innerHTML = '0'+event;
+					error = '';
 				}
 
 				else {
-					out.innerHTML+=event;
+					out.innerHTML += event;
 				}
-				bool=false;
-				bool2=false;
+				bool = false;
+				bool2 = false;
 				break;
 
 			case '0':
@@ -132,50 +132,62 @@
 			case '7':
 			case '8':
 			case '9':
-				if ((out.innerHTML=="0") || (bool2==true)) {
+				if ((out.innerHTML == "0") || (bool2 == true)) {
 					out.innerHTML=event;
+					error = '';
+					bool2 = false;
 				}
 
 				else {
-					out.innerHTML+=event;
+					out.innerHTML += event;
 				}
 
 				break;
 			case '=':
 
 			lastsum=out.innerHTML.substr(-1);
-			if (!((lastsum=='+') || (lastsum=='-') || (lastsum=='*') || (lastsum=='/'))) {
+			if (!((lastsum == '+') || (lastsum == '-') || (lastsum == '*') || (lastsum == '/'))) {
 			
 
 
 				str=out.innerHTML;
-				replacement('+');
-				replacement('-');
-				replacement('*');
-				replacement('/');
 
-				arr=str.split('?');
+				for (var i = 0; i < str.length; i++) {
+					if ((str[i] == '+') || (str[i] == '*') || (str[i] == '/')) {
+						massS.push(str[i]);
+						str = str.slice(0, i) + '?' + str.slice(i+1);
+					}
+					else if (str[i] == '-') {
+						if (i != 0) {							
+						massS.push('+');
+						str = str.slice(0, i) + '?' + str.slice(i);
+						i++;
+						}
+					}
+				}
+
+				arr = str.split('?');
 				for (var i = 0; i < massS.length; i++) {
-					if((massS[i]=='*') || (massS[i]=='/')) {
-						arr[i]=action(arr[i],arr[i+1],massS[i]);
-						arr.splice(i+1,1);
-						massS.splice(i,1);
-						if(arr[i]==Infinity) error="На 0 делить нельзя!";
+					if((massS[i] == '*') || (massS[i] == '/')) {
+						arr[i] = action(arr[i], arr[i+1], massS[i]);
+						arr.splice(i+1, 1);
+						massS.splice(i, 1);
+						if(arr[i] == Infinity) error = "На 0 делить нельзя!";
 
 					}
 				}
 
 				for (var i = 0; i < massS.length; i++) {
-					arr[i]=action(arr[i],arr[i+1],massS[i]);
-					arr.splice(i+1,1);
-					massS.splice(i,1);
+					arr[i] = action(arr[i],arr[i+1], massS[i]);
+					arr.splice(i+1, 1);
+					massS.splice(i, 1);
 				}
-				out.innerHTML=arr[0];
+				out.innerHTML = arr[0];
 				if (error) {
-					out.innerHTML=error;
+					out.innerHTML = error;
 				};
 
-				bool2=true;
+				bool2 = true;
 			}
 				break;
 
